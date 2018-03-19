@@ -1,24 +1,40 @@
-import * as jwt from 'jsonwebtoken'
-import { Prisma } from './generated/prisma'
+import jwt from 'jsonwebtoken';
+import { ContextParameters } from 'graphql-yoga/dist/src/types';
 
-export interface Context {
-  db: Prisma
-  request: any
+import { Prisma, UserRole, User } from './generated/prisma';
+import { APP_SECRET } from './constants';
+
+export interface Context extends ContextParameters {
+  db: Prisma;
 }
 
-export function getUserId(ctx: Context) {
-  const Authorization = ctx.request.get('Authorization')
-  if (Authorization) {
-    const token = Authorization.replace('Bearer ', '')
-    const { userId } = jwt.verify(token, process.env.APP_SECRET) as { userId: string }
-    return userId
+export interface Authentication {
+  id: string;
+  role: UserRole;
+}
+
+export function getToken(user: User) {
+  return jwt.sign(
+    {
+      id: user.id,
+      role: user.role,
+    } as Authentication,
+    APP_SECRET,
+  );
+}
+
+export function authenticate(ctx: Context) {
+  const authHeader = ctx.request.get('Authorization');
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    throw new AuthError();
   }
 
-  throw new AuthError()
+  const token = authHeader.slice(7);
+  return jwt.verify(token, APP_SECRET) as Authentication;
 }
 
 export class AuthError extends Error {
   constructor() {
-    super('Not authorized')
+    super('Not authorized');
   }
 }

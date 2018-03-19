@@ -6,15 +6,15 @@ type AuthPayload {
 type ProductData {
   description: String!
   picture: String!
-  price: Float!
+  unitPrice: Float!
 }
 
 union ProductInput = Product | ProductData
 
 type SellOrder {
   product: Product!
-  quantity: Int!
   unitPrice: Float!
+  quantity: Int!
 }
 
 type User {
@@ -22,8 +22,8 @@ type User {
   email: String!
   name: String!
   role: UserRole!
-  sales: [Sale!]!
-  itemsReceived: [Item!]!
+  receipts: [Receipt!]!
+  orders: [Order!]!
 }
 
 type Query {
@@ -35,7 +35,7 @@ type Query {
 type Mutation {
   signup(email: String!, password: String!, name: String!, role: UserRole!): AuthPayload!
   login(email: String!, password: String!): AuthPayload!
-  addProductItems(product: ProductInput!, quantity: Int!, unityCost: Float!): [Item!]!
+  receive(product: ProductInput!, quantity: Int!, unitCost: Float!): Receipt!
   sell(order: [SellOrder!]!): Order!
 }
 
@@ -43,10 +43,12 @@ type Product implements Node {
   id: ID!
   createdAt: DateTime!
   updatedAt: DateTime!
+  createdBy(where: UserWhereInput): User!
   description: String!
   picture: String!
-  price: Float!
-  items(where: ItemWhereInput, orderBy: ItemOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Item!]
+  unitPrice: Float!
+  quantity: Int!
+  receipts(where: ReceiptWhereInput, orderBy: ReceiptOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Receipt!]
   sales(where: SaleWhereInput, orderBy: SaleOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Sale!]
 }
 
@@ -63,23 +65,14 @@ enum UserRole {
   INVENTORY_MANAGER
 }
 
-type Item implements Node {
+type Receipt implements Node {
   id: ID!
   createdAt: DateTime!
   updatedAt: DateTime!
+  receivedBy(where: UserWhereInput): User!
   product(where: ProductWhereInput): Product!
-  cost: Float!
-  sale(where: SaleWhereInput): Sale
-}
-
-type Sale implements Node {
-  id: ID!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  price: Float!
-  seller(where: UserWhereInput): User!
-  product(where: ProductWhereInput): Product!
-  items(where: ItemWhereInput, orderBy: ItemOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Item!]
+  unitCost: Float!
+  quantity: Int!
 }
 
 """
@@ -94,267 +87,13 @@ interface Node {
 
 scalar DateTime
 
-input ProductWhereInput {
-  """
-  Logical AND on all given filters.
-  """
-  AND: [ProductWhereInput!]
-  """
-  Logical OR on all given filters.
-  """
-  OR: [ProductWhereInput!]
-  id: ID
-  """
-  All values that are not equal to given value.
-  """
-  id_not: ID
-  """
-  All values that are contained in given list.
-  """
-  id_in: [ID!]
-  """
-  All values that are not contained in given list.
-  """
-  id_not_in: [ID!]
-  """
-  All values less than the given value.
-  """
-  id_lt: ID
-  """
-  All values less than or equal the given value.
-  """
-  id_lte: ID
-  """
-  All values greater than the given value.
-  """
-  id_gt: ID
-  """
-  All values greater than or equal the given value.
-  """
-  id_gte: ID
-  """
-  All values containing the given string.
-  """
-  id_contains: ID
-  """
-  All values not containing the given string.
-  """
-  id_not_contains: ID
-  """
-  All values starting with the given string.
-  """
-  id_starts_with: ID
-  """
-  All values not starting with the given string.
-  """
-  id_not_starts_with: ID
-  """
-  All values ending with the given string.
-  """
-  id_ends_with: ID
-  """
-  All values not ending with the given string.
-  """
-  id_not_ends_with: ID
-  createdAt: DateTime
-  """
-  All values that are not equal to given value.
-  """
-  createdAt_not: DateTime
-  """
-  All values that are contained in given list.
-  """
-  createdAt_in: [DateTime!]
-  """
-  All values that are not contained in given list.
-  """
-  createdAt_not_in: [DateTime!]
-  """
-  All values less than the given value.
-  """
-  createdAt_lt: DateTime
-  """
-  All values less than or equal the given value.
-  """
-  createdAt_lte: DateTime
-  """
-  All values greater than the given value.
-  """
-  createdAt_gt: DateTime
-  """
-  All values greater than or equal the given value.
-  """
-  createdAt_gte: DateTime
-  updatedAt: DateTime
-  """
-  All values that are not equal to given value.
-  """
-  updatedAt_not: DateTime
-  """
-  All values that are contained in given list.
-  """
-  updatedAt_in: [DateTime!]
-  """
-  All values that are not contained in given list.
-  """
-  updatedAt_not_in: [DateTime!]
-  """
-  All values less than the given value.
-  """
-  updatedAt_lt: DateTime
-  """
-  All values less than or equal the given value.
-  """
-  updatedAt_lte: DateTime
-  """
-  All values greater than the given value.
-  """
-  updatedAt_gt: DateTime
-  """
-  All values greater than or equal the given value.
-  """
-  updatedAt_gte: DateTime
-  description: String
-  """
-  All values that are not equal to given value.
-  """
-  description_not: String
-  """
-  All values that are contained in given list.
-  """
-  description_in: [String!]
-  """
-  All values that are not contained in given list.
-  """
-  description_not_in: [String!]
-  """
-  All values less than the given value.
-  """
-  description_lt: String
-  """
-  All values less than or equal the given value.
-  """
-  description_lte: String
-  """
-  All values greater than the given value.
-  """
-  description_gt: String
-  """
-  All values greater than or equal the given value.
-  """
-  description_gte: String
-  """
-  All values containing the given string.
-  """
-  description_contains: String
-  """
-  All values not containing the given string.
-  """
-  description_not_contains: String
-  """
-  All values starting with the given string.
-  """
-  description_starts_with: String
-  """
-  All values not starting with the given string.
-  """
-  description_not_starts_with: String
-  """
-  All values ending with the given string.
-  """
-  description_ends_with: String
-  """
-  All values not ending with the given string.
-  """
-  description_not_ends_with: String
-  picture: String
-  """
-  All values that are not equal to given value.
-  """
-  picture_not: String
-  """
-  All values that are contained in given list.
-  """
-  picture_in: [String!]
-  """
-  All values that are not contained in given list.
-  """
-  picture_not_in: [String!]
-  """
-  All values less than the given value.
-  """
-  picture_lt: String
-  """
-  All values less than or equal the given value.
-  """
-  picture_lte: String
-  """
-  All values greater than the given value.
-  """
-  picture_gt: String
-  """
-  All values greater than or equal the given value.
-  """
-  picture_gte: String
-  """
-  All values containing the given string.
-  """
-  picture_contains: String
-  """
-  All values not containing the given string.
-  """
-  picture_not_contains: String
-  """
-  All values starting with the given string.
-  """
-  picture_starts_with: String
-  """
-  All values not starting with the given string.
-  """
-  picture_not_starts_with: String
-  """
-  All values ending with the given string.
-  """
-  picture_ends_with: String
-  """
-  All values not ending with the given string.
-  """
-  picture_not_ends_with: String
-  price: Float
-  """
-  All values that are not equal to given value.
-  """
-  price_not: Float
-  """
-  All values that are contained in given list.
-  """
-  price_in: [Float!]
-  """
-  All values that are not contained in given list.
-  """
-  price_not_in: [Float!]
-  """
-  All values less than the given value.
-  """
-  price_lt: Float
-  """
-  All values less than or equal the given value.
-  """
-  price_lte: Float
-  """
-  All values greater than the given value.
-  """
-  price_gt: Float
-  """
-  All values greater than or equal the given value.
-  """
-  price_gte: Float
-  items_every: ItemWhereInput
-  items_some: ItemWhereInput
-  items_none: ItemWhereInput
-  sales_every: SaleWhereInput
-  sales_some: SaleWhereInput
-  sales_none: SaleWhereInput
+type Sale implements Node {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  product(where: ProductWhereInput): Product!
+  unitPrice: Float!
+  quantity: Int!
 }
 
 input SaleWhereInput {
@@ -477,40 +216,65 @@ input SaleWhereInput {
   All values greater than or equal the given value.
   """
   updatedAt_gte: DateTime
-  price: Float
+  unitPrice: Float
   """
   All values that are not equal to given value.
   """
-  price_not: Float
+  unitPrice_not: Float
   """
   All values that are contained in given list.
   """
-  price_in: [Float!]
+  unitPrice_in: [Float!]
   """
   All values that are not contained in given list.
   """
-  price_not_in: [Float!]
+  unitPrice_not_in: [Float!]
   """
   All values less than the given value.
   """
-  price_lt: Float
+  unitPrice_lt: Float
   """
   All values less than or equal the given value.
   """
-  price_lte: Float
+  unitPrice_lte: Float
   """
   All values greater than the given value.
   """
-  price_gt: Float
+  unitPrice_gt: Float
   """
   All values greater than or equal the given value.
   """
-  price_gte: Float
-  seller: UserWhereInput
+  unitPrice_gte: Float
+  quantity: Int
+  """
+  All values that are not equal to given value.
+  """
+  quantity_not: Int
+  """
+  All values that are contained in given list.
+  """
+  quantity_in: [Int!]
+  """
+  All values that are not contained in given list.
+  """
+  quantity_not_in: [Int!]
+  """
+  All values less than the given value.
+  """
+  quantity_lt: Int
+  """
+  All values less than or equal the given value.
+  """
+  quantity_lte: Int
+  """
+  All values greater than the given value.
+  """
+  quantity_gt: Int
+  """
+  All values greater than or equal the given value.
+  """
+  quantity_gte: Int
   product: ProductWhereInput
-  items_every: ItemWhereInput
-  items_some: ItemWhereInput
-  items_none: ItemWhereInput
 }
 
 enum SaleOrderByInput {
@@ -520,8 +284,10 @@ enum SaleOrderByInput {
   createdAt_DESC
   updatedAt_ASC
   updatedAt_DESC
-  price_ASC
-  price_DESC
+  unitPrice_ASC
+  unitPrice_DESC
+  quantity_ASC
+  quantity_DESC
 }
 
 input UserWhereInput {
@@ -758,26 +524,23 @@ input UserWhereInput {
   All values that are not contained in given list.
   """
   role_not_in: [UserRole!]
-  sales_every: SaleWhereInput
-  sales_some: SaleWhereInput
-  sales_none: SaleWhereInput
+  receipts_every: ReceiptWhereInput
+  receipts_some: ReceiptWhereInput
+  receipts_none: ReceiptWhereInput
   orders_every: OrderWhereInput
   orders_some: OrderWhereInput
   orders_none: OrderWhereInput
-  itemsReceived_every: ItemWhereInput
-  itemsReceived_some: ItemWhereInput
-  itemsReceived_none: ItemWhereInput
 }
 
-input ItemWhereInput {
+input ReceiptWhereInput {
   """
   Logical AND on all given filters.
   """
-  AND: [ItemWhereInput!]
+  AND: [ReceiptWhereInput!]
   """
   Logical OR on all given filters.
   """
-  OR: [ItemWhereInput!]
+  OR: [ReceiptWhereInput!]
   id: ID
   """
   All values that are not equal to given value.
@@ -889,48 +652,372 @@ input ItemWhereInput {
   All values greater than or equal the given value.
   """
   updatedAt_gte: DateTime
-  cost: Float
+  unitCost: Float
   """
   All values that are not equal to given value.
   """
-  cost_not: Float
+  unitCost_not: Float
   """
   All values that are contained in given list.
   """
-  cost_in: [Float!]
+  unitCost_in: [Float!]
   """
   All values that are not contained in given list.
   """
-  cost_not_in: [Float!]
+  unitCost_not_in: [Float!]
   """
   All values less than the given value.
   """
-  cost_lt: Float
+  unitCost_lt: Float
   """
   All values less than or equal the given value.
   """
-  cost_lte: Float
+  unitCost_lte: Float
   """
   All values greater than the given value.
   """
-  cost_gt: Float
+  unitCost_gt: Float
   """
   All values greater than or equal the given value.
   """
-  cost_gte: Float
+  unitCost_gte: Float
+  quantity: Int
+  """
+  All values that are not equal to given value.
+  """
+  quantity_not: Int
+  """
+  All values that are contained in given list.
+  """
+  quantity_in: [Int!]
+  """
+  All values that are not contained in given list.
+  """
+  quantity_not_in: [Int!]
+  """
+  All values less than the given value.
+  """
+  quantity_lt: Int
+  """
+  All values less than or equal the given value.
+  """
+  quantity_lte: Int
+  """
+  All values greater than the given value.
+  """
+  quantity_gt: Int
+  """
+  All values greater than or equal the given value.
+  """
+  quantity_gte: Int
+  receivedBy: UserWhereInput
   product: ProductWhereInput
-  sale: SaleWhereInput
 }
 
-enum ItemOrderByInput {
+enum ReceiptOrderByInput {
   id_ASC
   id_DESC
   createdAt_ASC
   createdAt_DESC
   updatedAt_ASC
   updatedAt_DESC
-  cost_ASC
-  cost_DESC
+  unitCost_ASC
+  unitCost_DESC
+  quantity_ASC
+  quantity_DESC
+}
+
+input ProductWhereInput {
+  """
+  Logical AND on all given filters.
+  """
+  AND: [ProductWhereInput!]
+  """
+  Logical OR on all given filters.
+  """
+  OR: [ProductWhereInput!]
+  id: ID
+  """
+  All values that are not equal to given value.
+  """
+  id_not: ID
+  """
+  All values that are contained in given list.
+  """
+  id_in: [ID!]
+  """
+  All values that are not contained in given list.
+  """
+  id_not_in: [ID!]
+  """
+  All values less than the given value.
+  """
+  id_lt: ID
+  """
+  All values less than or equal the given value.
+  """
+  id_lte: ID
+  """
+  All values greater than the given value.
+  """
+  id_gt: ID
+  """
+  All values greater than or equal the given value.
+  """
+  id_gte: ID
+  """
+  All values containing the given string.
+  """
+  id_contains: ID
+  """
+  All values not containing the given string.
+  """
+  id_not_contains: ID
+  """
+  All values starting with the given string.
+  """
+  id_starts_with: ID
+  """
+  All values not starting with the given string.
+  """
+  id_not_starts_with: ID
+  """
+  All values ending with the given string.
+  """
+  id_ends_with: ID
+  """
+  All values not ending with the given string.
+  """
+  id_not_ends_with: ID
+  createdAt: DateTime
+  """
+  All values that are not equal to given value.
+  """
+  createdAt_not: DateTime
+  """
+  All values that are contained in given list.
+  """
+  createdAt_in: [DateTime!]
+  """
+  All values that are not contained in given list.
+  """
+  createdAt_not_in: [DateTime!]
+  """
+  All values less than the given value.
+  """
+  createdAt_lt: DateTime
+  """
+  All values less than or equal the given value.
+  """
+  createdAt_lte: DateTime
+  """
+  All values greater than the given value.
+  """
+  createdAt_gt: DateTime
+  """
+  All values greater than or equal the given value.
+  """
+  createdAt_gte: DateTime
+  updatedAt: DateTime
+  """
+  All values that are not equal to given value.
+  """
+  updatedAt_not: DateTime
+  """
+  All values that are contained in given list.
+  """
+  updatedAt_in: [DateTime!]
+  """
+  All values that are not contained in given list.
+  """
+  updatedAt_not_in: [DateTime!]
+  """
+  All values less than the given value.
+  """
+  updatedAt_lt: DateTime
+  """
+  All values less than or equal the given value.
+  """
+  updatedAt_lte: DateTime
+  """
+  All values greater than the given value.
+  """
+  updatedAt_gt: DateTime
+  """
+  All values greater than or equal the given value.
+  """
+  updatedAt_gte: DateTime
+  description: String
+  """
+  All values that are not equal to given value.
+  """
+  description_not: String
+  """
+  All values that are contained in given list.
+  """
+  description_in: [String!]
+  """
+  All values that are not contained in given list.
+  """
+  description_not_in: [String!]
+  """
+  All values less than the given value.
+  """
+  description_lt: String
+  """
+  All values less than or equal the given value.
+  """
+  description_lte: String
+  """
+  All values greater than the given value.
+  """
+  description_gt: String
+  """
+  All values greater than or equal the given value.
+  """
+  description_gte: String
+  """
+  All values containing the given string.
+  """
+  description_contains: String
+  """
+  All values not containing the given string.
+  """
+  description_not_contains: String
+  """
+  All values starting with the given string.
+  """
+  description_starts_with: String
+  """
+  All values not starting with the given string.
+  """
+  description_not_starts_with: String
+  """
+  All values ending with the given string.
+  """
+  description_ends_with: String
+  """
+  All values not ending with the given string.
+  """
+  description_not_ends_with: String
+  picture: String
+  """
+  All values that are not equal to given value.
+  """
+  picture_not: String
+  """
+  All values that are contained in given list.
+  """
+  picture_in: [String!]
+  """
+  All values that are not contained in given list.
+  """
+  picture_not_in: [String!]
+  """
+  All values less than the given value.
+  """
+  picture_lt: String
+  """
+  All values less than or equal the given value.
+  """
+  picture_lte: String
+  """
+  All values greater than the given value.
+  """
+  picture_gt: String
+  """
+  All values greater than or equal the given value.
+  """
+  picture_gte: String
+  """
+  All values containing the given string.
+  """
+  picture_contains: String
+  """
+  All values not containing the given string.
+  """
+  picture_not_contains: String
+  """
+  All values starting with the given string.
+  """
+  picture_starts_with: String
+  """
+  All values not starting with the given string.
+  """
+  picture_not_starts_with: String
+  """
+  All values ending with the given string.
+  """
+  picture_ends_with: String
+  """
+  All values not ending with the given string.
+  """
+  picture_not_ends_with: String
+  unitPrice: Float
+  """
+  All values that are not equal to given value.
+  """
+  unitPrice_not: Float
+  """
+  All values that are contained in given list.
+  """
+  unitPrice_in: [Float!]
+  """
+  All values that are not contained in given list.
+  """
+  unitPrice_not_in: [Float!]
+  """
+  All values less than the given value.
+  """
+  unitPrice_lt: Float
+  """
+  All values less than or equal the given value.
+  """
+  unitPrice_lte: Float
+  """
+  All values greater than the given value.
+  """
+  unitPrice_gt: Float
+  """
+  All values greater than or equal the given value.
+  """
+  unitPrice_gte: Float
+  quantity: Int
+  """
+  All values that are not equal to given value.
+  """
+  quantity_not: Int
+  """
+  All values that are contained in given list.
+  """
+  quantity_in: [Int!]
+  """
+  All values that are not contained in given list.
+  """
+  quantity_not_in: [Int!]
+  """
+  All values less than the given value.
+  """
+  quantity_lt: Int
+  """
+  All values less than or equal the given value.
+  """
+  quantity_lte: Int
+  """
+  All values greater than the given value.
+  """
+  quantity_gt: Int
+  """
+  All values greater than or equal the given value.
+  """
+  quantity_gte: Int
+  createdBy: UserWhereInput
+  receipts_every: ReceiptWhereInput
+  receipts_some: ReceiptWhereInput
+  receipts_none: ReceiptWhereInput
+  sales_every: SaleWhereInput
+  sales_some: SaleWhereInput
+  sales_none: SaleWhereInput
 }
 
 input OrderWhereInput {

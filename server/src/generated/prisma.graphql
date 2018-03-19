@@ -5,15 +5,6 @@
 # Model Types
 #
 
-type Item implements Node {
-  id: ID!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  product(where: ProductWhereInput): Product!
-  cost: Float!
-  sale(where: SaleWhereInput): Sale
-}
-
 type Order implements Node {
   id: ID!
   createdAt: DateTime!
@@ -26,21 +17,32 @@ type Product implements Node {
   id: ID!
   createdAt: DateTime!
   updatedAt: DateTime!
+  createdBy(where: UserWhereInput): User!
   description: String!
   picture: String!
-  price: Float!
-  items(where: ItemWhereInput, orderBy: ItemOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Item!]
+  unitPrice: Float!
+  quantity: Int!
+  receipts(where: ReceiptWhereInput, orderBy: ReceiptOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Receipt!]
   sales(where: SaleWhereInput, orderBy: SaleOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Sale!]
+}
+
+type Receipt implements Node {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  receivedBy(where: UserWhereInput): User!
+  product(where: ProductWhereInput): Product!
+  unitCost: Float!
+  quantity: Int!
 }
 
 type Sale implements Node {
   id: ID!
   createdAt: DateTime!
   updatedAt: DateTime!
-  price: Float!
-  seller(where: UserWhereInput): User!
   product(where: ProductWhereInput): Product!
-  items(where: ItemWhereInput, orderBy: ItemOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Item!]
+  unitPrice: Float!
+  quantity: Int!
 }
 
 type User implements Node {
@@ -49,9 +51,8 @@ type User implements Node {
   password: String!
   name: String!
   role: UserRole!
-  sales(where: SaleWhereInput, orderBy: SaleOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Sale!]
+  receipts(where: ReceiptWhereInput, orderBy: ReceiptOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Receipt!]
   orders(where: OrderWhereInput, orderBy: OrderOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Order!]
-  itemsReceived(where: ItemWhereInput, orderBy: ItemOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Item!]
 }
 
 
@@ -59,15 +60,15 @@ type User implements Node {
 # Other Types
 #
 
-type AggregateItem {
-  count: Int!
-}
-
 type AggregateOrder {
   count: Int!
 }
 
 type AggregateProduct {
+  count: Int!
+}
+
+type AggregateReceipt {
   count: Int!
 }
 
@@ -89,358 +90,6 @@ type BatchPayload {
 scalar DateTime
 
 """
-A connection to a list of items.
-"""
-type ItemConnection {
-  """
-  Information to aid in pagination.
-  """
-  pageInfo: PageInfo!
-  """
-  A list of edges.
-  """
-  edges: [ItemEdge]!
-  aggregate: AggregateItem!
-}
-
-input ItemCreateInput {
-  cost: Float!
-  product: ProductCreateOneWithoutItemsInput!
-  sale: SaleCreateOneWithoutItemsInput
-}
-
-input ItemCreateManyInput {
-  create: [ItemCreateInput!]
-  connect: [ItemWhereUniqueInput!]
-}
-
-input ItemCreateManyWithoutProductInput {
-  create: [ItemCreateWithoutProductInput!]
-  connect: [ItemWhereUniqueInput!]
-}
-
-input ItemCreateManyWithoutSaleInput {
-  create: [ItemCreateWithoutSaleInput!]
-  connect: [ItemWhereUniqueInput!]
-}
-
-input ItemCreateWithoutProductInput {
-  cost: Float!
-  sale: SaleCreateOneWithoutItemsInput
-}
-
-input ItemCreateWithoutSaleInput {
-  cost: Float!
-  product: ProductCreateOneWithoutItemsInput!
-}
-
-"""
-An edge in a connection.
-"""
-type ItemEdge {
-  """
-  The item at the end of the edge.
-  """
-  node: Item!
-  """
-  A cursor for use in pagination.
-  """
-  cursor: String!
-}
-
-enum ItemOrderByInput {
-  id_ASC
-  id_DESC
-  createdAt_ASC
-  createdAt_DESC
-  updatedAt_ASC
-  updatedAt_DESC
-  cost_ASC
-  cost_DESC
-}
-
-type ItemPreviousValues {
-  id: ID!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  cost: Float!
-}
-
-type ItemSubscriptionPayload {
-  mutation: MutationType!
-  node: Item
-  updatedFields: [String!]
-  previousValues: ItemPreviousValues
-}
-
-input ItemSubscriptionWhereInput {
-  """
-  Logical AND on all given filters.
-  """
-  AND: [ItemSubscriptionWhereInput!]
-  """
-  Logical OR on all given filters.
-  """
-  OR: [ItemSubscriptionWhereInput!]
-  """
-  The subscription event gets dispatched when it's listed in mutation_in
-  """
-  mutation_in: [MutationType!]
-  """
-  The subscription event gets only dispatched when one of the updated fields names is included in this list
-  """
-  updatedFields_contains: String
-  """
-  The subscription event gets only dispatched when all of the field names included in this list have been updated
-  """
-  updatedFields_contains_every: [String!]
-  """
-  The subscription event gets only dispatched when some of the field names included in this list have been updated
-  """
-  updatedFields_contains_some: [String!]
-  node: ItemWhereInput
-}
-
-input ItemUpdateDataInput {
-  cost: Float
-  product: ProductUpdateOneWithoutItemsInput
-  sale: SaleUpdateOneWithoutItemsInput
-}
-
-input ItemUpdateInput {
-  cost: Float
-  product: ProductUpdateOneWithoutItemsInput
-  sale: SaleUpdateOneWithoutItemsInput
-}
-
-input ItemUpdateManyInput {
-  create: [ItemCreateInput!]
-  connect: [ItemWhereUniqueInput!]
-  disconnect: [ItemWhereUniqueInput!]
-  delete: [ItemWhereUniqueInput!]
-  update: [ItemUpdateNestedInput!]
-  upsert: [ItemUpsertNestedInput!]
-}
-
-input ItemUpdateManyWithoutProductInput {
-  create: [ItemCreateWithoutProductInput!]
-  connect: [ItemWhereUniqueInput!]
-  disconnect: [ItemWhereUniqueInput!]
-  delete: [ItemWhereUniqueInput!]
-  update: [ItemUpdateWithoutProductInput!]
-  upsert: [ItemUpsertWithoutProductInput!]
-}
-
-input ItemUpdateManyWithoutSaleInput {
-  create: [ItemCreateWithoutSaleInput!]
-  connect: [ItemWhereUniqueInput!]
-  disconnect: [ItemWhereUniqueInput!]
-  delete: [ItemWhereUniqueInput!]
-  update: [ItemUpdateWithoutSaleInput!]
-  upsert: [ItemUpsertWithoutSaleInput!]
-}
-
-input ItemUpdateNestedInput {
-  where: ItemWhereUniqueInput!
-  data: ItemUpdateDataInput!
-}
-
-input ItemUpdateWithoutProductDataInput {
-  cost: Float
-  sale: SaleUpdateOneWithoutItemsInput
-}
-
-input ItemUpdateWithoutProductInput {
-  where: ItemWhereUniqueInput!
-  data: ItemUpdateWithoutProductDataInput!
-}
-
-input ItemUpdateWithoutSaleDataInput {
-  cost: Float
-  product: ProductUpdateOneWithoutItemsInput
-}
-
-input ItemUpdateWithoutSaleInput {
-  where: ItemWhereUniqueInput!
-  data: ItemUpdateWithoutSaleDataInput!
-}
-
-input ItemUpsertNestedInput {
-  where: ItemWhereUniqueInput!
-  update: ItemUpdateDataInput!
-  create: ItemCreateInput!
-}
-
-input ItemUpsertWithoutProductInput {
-  where: ItemWhereUniqueInput!
-  update: ItemUpdateWithoutProductDataInput!
-  create: ItemCreateWithoutProductInput!
-}
-
-input ItemUpsertWithoutSaleInput {
-  where: ItemWhereUniqueInput!
-  update: ItemUpdateWithoutSaleDataInput!
-  create: ItemCreateWithoutSaleInput!
-}
-
-input ItemWhereInput {
-  """
-  Logical AND on all given filters.
-  """
-  AND: [ItemWhereInput!]
-  """
-  Logical OR on all given filters.
-  """
-  OR: [ItemWhereInput!]
-  id: ID
-  """
-  All values that are not equal to given value.
-  """
-  id_not: ID
-  """
-  All values that are contained in given list.
-  """
-  id_in: [ID!]
-  """
-  All values that are not contained in given list.
-  """
-  id_not_in: [ID!]
-  """
-  All values less than the given value.
-  """
-  id_lt: ID
-  """
-  All values less than or equal the given value.
-  """
-  id_lte: ID
-  """
-  All values greater than the given value.
-  """
-  id_gt: ID
-  """
-  All values greater than or equal the given value.
-  """
-  id_gte: ID
-  """
-  All values containing the given string.
-  """
-  id_contains: ID
-  """
-  All values not containing the given string.
-  """
-  id_not_contains: ID
-  """
-  All values starting with the given string.
-  """
-  id_starts_with: ID
-  """
-  All values not starting with the given string.
-  """
-  id_not_starts_with: ID
-  """
-  All values ending with the given string.
-  """
-  id_ends_with: ID
-  """
-  All values not ending with the given string.
-  """
-  id_not_ends_with: ID
-  createdAt: DateTime
-  """
-  All values that are not equal to given value.
-  """
-  createdAt_not: DateTime
-  """
-  All values that are contained in given list.
-  """
-  createdAt_in: [DateTime!]
-  """
-  All values that are not contained in given list.
-  """
-  createdAt_not_in: [DateTime!]
-  """
-  All values less than the given value.
-  """
-  createdAt_lt: DateTime
-  """
-  All values less than or equal the given value.
-  """
-  createdAt_lte: DateTime
-  """
-  All values greater than the given value.
-  """
-  createdAt_gt: DateTime
-  """
-  All values greater than or equal the given value.
-  """
-  createdAt_gte: DateTime
-  updatedAt: DateTime
-  """
-  All values that are not equal to given value.
-  """
-  updatedAt_not: DateTime
-  """
-  All values that are contained in given list.
-  """
-  updatedAt_in: [DateTime!]
-  """
-  All values that are not contained in given list.
-  """
-  updatedAt_not_in: [DateTime!]
-  """
-  All values less than the given value.
-  """
-  updatedAt_lt: DateTime
-  """
-  All values less than or equal the given value.
-  """
-  updatedAt_lte: DateTime
-  """
-  All values greater than the given value.
-  """
-  updatedAt_gt: DateTime
-  """
-  All values greater than or equal the given value.
-  """
-  updatedAt_gte: DateTime
-  cost: Float
-  """
-  All values that are not equal to given value.
-  """
-  cost_not: Float
-  """
-  All values that are contained in given list.
-  """
-  cost_in: [Float!]
-  """
-  All values that are not contained in given list.
-  """
-  cost_not_in: [Float!]
-  """
-  All values less than the given value.
-  """
-  cost_lt: Float
-  """
-  All values less than or equal the given value.
-  """
-  cost_lte: Float
-  """
-  All values greater than the given value.
-  """
-  cost_gt: Float
-  """
-  All values greater than or equal the given value.
-  """
-  cost_gte: Float
-  product: ProductWhereInput
-  sale: SaleWhereInput
-}
-
-input ItemWhereUniqueInput {
-  id: ID
-}
-
-"""
 The `Long` scalar type represents non-fractional signed whole numeric values.
 Long can represent values between -(2^63) and 2^63 - 1.
 """
@@ -448,32 +97,32 @@ scalar Long
 
 type Mutation {
   createProduct(data: ProductCreateInput!): Product!
-  createItem(data: ItemCreateInput!): Item!
+  createReceipt(data: ReceiptCreateInput!): Receipt!
   createSale(data: SaleCreateInput!): Sale!
   createOrder(data: OrderCreateInput!): Order!
   createUser(data: UserCreateInput!): User!
   updateProduct(data: ProductUpdateInput!, where: ProductWhereUniqueInput!): Product
-  updateItem(data: ItemUpdateInput!, where: ItemWhereUniqueInput!): Item
+  updateReceipt(data: ReceiptUpdateInput!, where: ReceiptWhereUniqueInput!): Receipt
   updateSale(data: SaleUpdateInput!, where: SaleWhereUniqueInput!): Sale
   updateOrder(data: OrderUpdateInput!, where: OrderWhereUniqueInput!): Order
   updateUser(data: UserUpdateInput!, where: UserWhereUniqueInput!): User
   deleteProduct(where: ProductWhereUniqueInput!): Product
-  deleteItem(where: ItemWhereUniqueInput!): Item
+  deleteReceipt(where: ReceiptWhereUniqueInput!): Receipt
   deleteSale(where: SaleWhereUniqueInput!): Sale
   deleteOrder(where: OrderWhereUniqueInput!): Order
   deleteUser(where: UserWhereUniqueInput!): User
   upsertProduct(where: ProductWhereUniqueInput!, create: ProductCreateInput!, update: ProductUpdateInput!): Product!
-  upsertItem(where: ItemWhereUniqueInput!, create: ItemCreateInput!, update: ItemUpdateInput!): Item!
+  upsertReceipt(where: ReceiptWhereUniqueInput!, create: ReceiptCreateInput!, update: ReceiptUpdateInput!): Receipt!
   upsertSale(where: SaleWhereUniqueInput!, create: SaleCreateInput!, update: SaleUpdateInput!): Sale!
   upsertOrder(where: OrderWhereUniqueInput!, create: OrderCreateInput!, update: OrderUpdateInput!): Order!
   upsertUser(where: UserWhereUniqueInput!, create: UserCreateInput!, update: UserUpdateInput!): User!
   updateManyProducts(data: ProductUpdateInput!, where: ProductWhereInput!): BatchPayload!
-  updateManyItems(data: ItemUpdateInput!, where: ItemWhereInput!): BatchPayload!
+  updateManyReceipts(data: ReceiptUpdateInput!, where: ReceiptWhereInput!): BatchPayload!
   updateManySales(data: SaleUpdateInput!, where: SaleWhereInput!): BatchPayload!
   updateManyOrders(data: OrderUpdateInput!, where: OrderWhereInput!): BatchPayload!
   updateManyUsers(data: UserUpdateInput!, where: UserWhereInput!): BatchPayload!
   deleteManyProducts(where: ProductWhereInput!): BatchPayload!
-  deleteManyItems(where: ItemWhereInput!): BatchPayload!
+  deleteManyReceipts(where: ReceiptWhereInput!): BatchPayload!
   deleteManySales(where: SaleWhereInput!): BatchPayload!
   deleteManyOrders(where: OrderWhereInput!): BatchPayload!
   deleteManyUsers(where: UserWhereInput!): BatchPayload!
@@ -787,13 +436,15 @@ type ProductConnection {
 input ProductCreateInput {
   description: String!
   picture: String!
-  price: Float!
-  items: ItemCreateManyWithoutProductInput
+  unitPrice: Float!
+  quantity: Int!
+  createdBy: UserCreateOneInput!
+  receipts: ReceiptCreateManyWithoutProductInput
   sales: SaleCreateManyWithoutProductInput
 }
 
-input ProductCreateOneWithoutItemsInput {
-  create: ProductCreateWithoutItemsInput
+input ProductCreateOneWithoutReceiptsInput {
+  create: ProductCreateWithoutReceiptsInput
   connect: ProductWhereUniqueInput
 }
 
@@ -802,18 +453,22 @@ input ProductCreateOneWithoutSalesInput {
   connect: ProductWhereUniqueInput
 }
 
-input ProductCreateWithoutItemsInput {
+input ProductCreateWithoutReceiptsInput {
   description: String!
   picture: String!
-  price: Float!
+  unitPrice: Float!
+  quantity: Int!
+  createdBy: UserCreateOneInput!
   sales: SaleCreateManyWithoutProductInput
 }
 
 input ProductCreateWithoutSalesInput {
   description: String!
   picture: String!
-  price: Float!
-  items: ItemCreateManyWithoutProductInput
+  unitPrice: Float!
+  quantity: Int!
+  createdBy: UserCreateOneInput!
+  receipts: ReceiptCreateManyWithoutProductInput
 }
 
 """
@@ -841,8 +496,10 @@ enum ProductOrderByInput {
   description_DESC
   picture_ASC
   picture_DESC
-  price_ASC
-  price_DESC
+  unitPrice_ASC
+  unitPrice_DESC
+  quantity_ASC
+  quantity_DESC
 }
 
 type ProductPreviousValues {
@@ -851,7 +508,8 @@ type ProductPreviousValues {
   updatedAt: DateTime!
   description: String!
   picture: String!
-  price: Float!
+  unitPrice: Float!
+  quantity: Int!
 }
 
 type ProductSubscriptionPayload {
@@ -892,18 +550,20 @@ input ProductSubscriptionWhereInput {
 input ProductUpdateInput {
   description: String
   picture: String
-  price: Float
-  items: ItemUpdateManyWithoutProductInput
+  unitPrice: Float
+  quantity: Int
+  createdBy: UserUpdateOneInput
+  receipts: ReceiptUpdateManyWithoutProductInput
   sales: SaleUpdateManyWithoutProductInput
 }
 
-input ProductUpdateOneWithoutItemsInput {
-  create: ProductCreateWithoutItemsInput
+input ProductUpdateOneWithoutReceiptsInput {
+  create: ProductCreateWithoutReceiptsInput
   connect: ProductWhereUniqueInput
   disconnect: ProductWhereUniqueInput
   delete: ProductWhereUniqueInput
-  update: ProductUpdateWithoutItemsInput
-  upsert: ProductUpsertWithoutItemsInput
+  update: ProductUpdateWithoutReceiptsInput
+  upsert: ProductUpsertWithoutReceiptsInput
 }
 
 input ProductUpdateOneWithoutSalesInput {
@@ -915,23 +575,27 @@ input ProductUpdateOneWithoutSalesInput {
   upsert: ProductUpsertWithoutSalesInput
 }
 
-input ProductUpdateWithoutItemsDataInput {
+input ProductUpdateWithoutReceiptsDataInput {
   description: String
   picture: String
-  price: Float
+  unitPrice: Float
+  quantity: Int
+  createdBy: UserUpdateOneInput
   sales: SaleUpdateManyWithoutProductInput
 }
 
-input ProductUpdateWithoutItemsInput {
+input ProductUpdateWithoutReceiptsInput {
   where: ProductWhereUniqueInput!
-  data: ProductUpdateWithoutItemsDataInput!
+  data: ProductUpdateWithoutReceiptsDataInput!
 }
 
 input ProductUpdateWithoutSalesDataInput {
   description: String
   picture: String
-  price: Float
-  items: ItemUpdateManyWithoutProductInput
+  unitPrice: Float
+  quantity: Int
+  createdBy: UserUpdateOneInput
+  receipts: ReceiptUpdateManyWithoutProductInput
 }
 
 input ProductUpdateWithoutSalesInput {
@@ -939,10 +603,10 @@ input ProductUpdateWithoutSalesInput {
   data: ProductUpdateWithoutSalesDataInput!
 }
 
-input ProductUpsertWithoutItemsInput {
+input ProductUpsertWithoutReceiptsInput {
   where: ProductWhereUniqueInput!
-  update: ProductUpdateWithoutItemsDataInput!
-  create: ProductCreateWithoutItemsInput!
+  update: ProductUpdateWithoutReceiptsDataInput!
+  create: ProductCreateWithoutReceiptsInput!
 }
 
 input ProductUpsertWithoutSalesInput {
@@ -1177,38 +841,68 @@ input ProductWhereInput {
   All values not ending with the given string.
   """
   picture_not_ends_with: String
-  price: Float
+  unitPrice: Float
   """
   All values that are not equal to given value.
   """
-  price_not: Float
+  unitPrice_not: Float
   """
   All values that are contained in given list.
   """
-  price_in: [Float!]
+  unitPrice_in: [Float!]
   """
   All values that are not contained in given list.
   """
-  price_not_in: [Float!]
+  unitPrice_not_in: [Float!]
   """
   All values less than the given value.
   """
-  price_lt: Float
+  unitPrice_lt: Float
   """
   All values less than or equal the given value.
   """
-  price_lte: Float
+  unitPrice_lte: Float
   """
   All values greater than the given value.
   """
-  price_gt: Float
+  unitPrice_gt: Float
   """
   All values greater than or equal the given value.
   """
-  price_gte: Float
-  items_every: ItemWhereInput
-  items_some: ItemWhereInput
-  items_none: ItemWhereInput
+  unitPrice_gte: Float
+  quantity: Int
+  """
+  All values that are not equal to given value.
+  """
+  quantity_not: Int
+  """
+  All values that are contained in given list.
+  """
+  quantity_in: [Int!]
+  """
+  All values that are not contained in given list.
+  """
+  quantity_not_in: [Int!]
+  """
+  All values less than the given value.
+  """
+  quantity_lt: Int
+  """
+  All values less than or equal the given value.
+  """
+  quantity_lte: Int
+  """
+  All values greater than the given value.
+  """
+  quantity_gt: Int
+  """
+  All values greater than or equal the given value.
+  """
+  quantity_gte: Int
+  createdBy: UserWhereInput
+  receipts_every: ReceiptWhereInput
+  receipts_some: ReceiptWhereInput
+  receipts_none: ReceiptWhereInput
   sales_every: SaleWhereInput
   sales_some: SaleWhereInput
   sales_none: SaleWhereInput
@@ -1220,17 +914,17 @@ input ProductWhereUniqueInput {
 
 type Query {
   products(where: ProductWhereInput, orderBy: ProductOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Product]!
-  items(where: ItemWhereInput, orderBy: ItemOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Item]!
+  receipts(where: ReceiptWhereInput, orderBy: ReceiptOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Receipt]!
   sales(where: SaleWhereInput, orderBy: SaleOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Sale]!
   orders(where: OrderWhereInput, orderBy: OrderOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Order]!
   users(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User]!
   product(where: ProductWhereUniqueInput!): Product
-  item(where: ItemWhereUniqueInput!): Item
+  receipt(where: ReceiptWhereUniqueInput!): Receipt
   sale(where: SaleWhereUniqueInput!): Sale
   order(where: OrderWhereUniqueInput!): Order
   user(where: UserWhereUniqueInput!): User
   productsConnection(where: ProductWhereInput, orderBy: ProductOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): ProductConnection!
-  itemsConnection(where: ItemWhereInput, orderBy: ItemOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): ItemConnection!
+  receiptsConnection(where: ReceiptWhereInput, orderBy: ReceiptOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): ReceiptConnection!
   salesConnection(where: SaleWhereInput, orderBy: SaleOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): SaleConnection!
   ordersConnection(where: OrderWhereInput, orderBy: OrderOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): OrderConnection!
   usersConnection(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): UserConnection!
@@ -1241,6 +935,365 @@ type Query {
   The ID of an object
   """
   id: ID!): Node
+}
+
+"""
+A connection to a list of items.
+"""
+type ReceiptConnection {
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+  """
+  A list of edges.
+  """
+  edges: [ReceiptEdge]!
+  aggregate: AggregateReceipt!
+}
+
+input ReceiptCreateInput {
+  unitCost: Float!
+  quantity: Int!
+  receivedBy: UserCreateOneWithoutReceiptsInput!
+  product: ProductCreateOneWithoutReceiptsInput!
+}
+
+input ReceiptCreateManyWithoutProductInput {
+  create: [ReceiptCreateWithoutProductInput!]
+  connect: [ReceiptWhereUniqueInput!]
+}
+
+input ReceiptCreateManyWithoutReceivedByInput {
+  create: [ReceiptCreateWithoutReceivedByInput!]
+  connect: [ReceiptWhereUniqueInput!]
+}
+
+input ReceiptCreateWithoutProductInput {
+  unitCost: Float!
+  quantity: Int!
+  receivedBy: UserCreateOneWithoutReceiptsInput!
+}
+
+input ReceiptCreateWithoutReceivedByInput {
+  unitCost: Float!
+  quantity: Int!
+  product: ProductCreateOneWithoutReceiptsInput!
+}
+
+"""
+An edge in a connection.
+"""
+type ReceiptEdge {
+  """
+  The item at the end of the edge.
+  """
+  node: Receipt!
+  """
+  A cursor for use in pagination.
+  """
+  cursor: String!
+}
+
+enum ReceiptOrderByInput {
+  id_ASC
+  id_DESC
+  createdAt_ASC
+  createdAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+  unitCost_ASC
+  unitCost_DESC
+  quantity_ASC
+  quantity_DESC
+}
+
+type ReceiptPreviousValues {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  unitCost: Float!
+  quantity: Int!
+}
+
+type ReceiptSubscriptionPayload {
+  mutation: MutationType!
+  node: Receipt
+  updatedFields: [String!]
+  previousValues: ReceiptPreviousValues
+}
+
+input ReceiptSubscriptionWhereInput {
+  """
+  Logical AND on all given filters.
+  """
+  AND: [ReceiptSubscriptionWhereInput!]
+  """
+  Logical OR on all given filters.
+  """
+  OR: [ReceiptSubscriptionWhereInput!]
+  """
+  The subscription event gets dispatched when it's listed in mutation_in
+  """
+  mutation_in: [MutationType!]
+  """
+  The subscription event gets only dispatched when one of the updated fields names is included in this list
+  """
+  updatedFields_contains: String
+  """
+  The subscription event gets only dispatched when all of the field names included in this list have been updated
+  """
+  updatedFields_contains_every: [String!]
+  """
+  The subscription event gets only dispatched when some of the field names included in this list have been updated
+  """
+  updatedFields_contains_some: [String!]
+  node: ReceiptWhereInput
+}
+
+input ReceiptUpdateInput {
+  unitCost: Float
+  quantity: Int
+  receivedBy: UserUpdateOneWithoutReceiptsInput
+  product: ProductUpdateOneWithoutReceiptsInput
+}
+
+input ReceiptUpdateManyWithoutProductInput {
+  create: [ReceiptCreateWithoutProductInput!]
+  connect: [ReceiptWhereUniqueInput!]
+  disconnect: [ReceiptWhereUniqueInput!]
+  delete: [ReceiptWhereUniqueInput!]
+  update: [ReceiptUpdateWithoutProductInput!]
+  upsert: [ReceiptUpsertWithoutProductInput!]
+}
+
+input ReceiptUpdateManyWithoutReceivedByInput {
+  create: [ReceiptCreateWithoutReceivedByInput!]
+  connect: [ReceiptWhereUniqueInput!]
+  disconnect: [ReceiptWhereUniqueInput!]
+  delete: [ReceiptWhereUniqueInput!]
+  update: [ReceiptUpdateWithoutReceivedByInput!]
+  upsert: [ReceiptUpsertWithoutReceivedByInput!]
+}
+
+input ReceiptUpdateWithoutProductDataInput {
+  unitCost: Float
+  quantity: Int
+  receivedBy: UserUpdateOneWithoutReceiptsInput
+}
+
+input ReceiptUpdateWithoutProductInput {
+  where: ReceiptWhereUniqueInput!
+  data: ReceiptUpdateWithoutProductDataInput!
+}
+
+input ReceiptUpdateWithoutReceivedByDataInput {
+  unitCost: Float
+  quantity: Int
+  product: ProductUpdateOneWithoutReceiptsInput
+}
+
+input ReceiptUpdateWithoutReceivedByInput {
+  where: ReceiptWhereUniqueInput!
+  data: ReceiptUpdateWithoutReceivedByDataInput!
+}
+
+input ReceiptUpsertWithoutProductInput {
+  where: ReceiptWhereUniqueInput!
+  update: ReceiptUpdateWithoutProductDataInput!
+  create: ReceiptCreateWithoutProductInput!
+}
+
+input ReceiptUpsertWithoutReceivedByInput {
+  where: ReceiptWhereUniqueInput!
+  update: ReceiptUpdateWithoutReceivedByDataInput!
+  create: ReceiptCreateWithoutReceivedByInput!
+}
+
+input ReceiptWhereInput {
+  """
+  Logical AND on all given filters.
+  """
+  AND: [ReceiptWhereInput!]
+  """
+  Logical OR on all given filters.
+  """
+  OR: [ReceiptWhereInput!]
+  id: ID
+  """
+  All values that are not equal to given value.
+  """
+  id_not: ID
+  """
+  All values that are contained in given list.
+  """
+  id_in: [ID!]
+  """
+  All values that are not contained in given list.
+  """
+  id_not_in: [ID!]
+  """
+  All values less than the given value.
+  """
+  id_lt: ID
+  """
+  All values less than or equal the given value.
+  """
+  id_lte: ID
+  """
+  All values greater than the given value.
+  """
+  id_gt: ID
+  """
+  All values greater than or equal the given value.
+  """
+  id_gte: ID
+  """
+  All values containing the given string.
+  """
+  id_contains: ID
+  """
+  All values not containing the given string.
+  """
+  id_not_contains: ID
+  """
+  All values starting with the given string.
+  """
+  id_starts_with: ID
+  """
+  All values not starting with the given string.
+  """
+  id_not_starts_with: ID
+  """
+  All values ending with the given string.
+  """
+  id_ends_with: ID
+  """
+  All values not ending with the given string.
+  """
+  id_not_ends_with: ID
+  createdAt: DateTime
+  """
+  All values that are not equal to given value.
+  """
+  createdAt_not: DateTime
+  """
+  All values that are contained in given list.
+  """
+  createdAt_in: [DateTime!]
+  """
+  All values that are not contained in given list.
+  """
+  createdAt_not_in: [DateTime!]
+  """
+  All values less than the given value.
+  """
+  createdAt_lt: DateTime
+  """
+  All values less than or equal the given value.
+  """
+  createdAt_lte: DateTime
+  """
+  All values greater than the given value.
+  """
+  createdAt_gt: DateTime
+  """
+  All values greater than or equal the given value.
+  """
+  createdAt_gte: DateTime
+  updatedAt: DateTime
+  """
+  All values that are not equal to given value.
+  """
+  updatedAt_not: DateTime
+  """
+  All values that are contained in given list.
+  """
+  updatedAt_in: [DateTime!]
+  """
+  All values that are not contained in given list.
+  """
+  updatedAt_not_in: [DateTime!]
+  """
+  All values less than the given value.
+  """
+  updatedAt_lt: DateTime
+  """
+  All values less than or equal the given value.
+  """
+  updatedAt_lte: DateTime
+  """
+  All values greater than the given value.
+  """
+  updatedAt_gt: DateTime
+  """
+  All values greater than or equal the given value.
+  """
+  updatedAt_gte: DateTime
+  unitCost: Float
+  """
+  All values that are not equal to given value.
+  """
+  unitCost_not: Float
+  """
+  All values that are contained in given list.
+  """
+  unitCost_in: [Float!]
+  """
+  All values that are not contained in given list.
+  """
+  unitCost_not_in: [Float!]
+  """
+  All values less than the given value.
+  """
+  unitCost_lt: Float
+  """
+  All values less than or equal the given value.
+  """
+  unitCost_lte: Float
+  """
+  All values greater than the given value.
+  """
+  unitCost_gt: Float
+  """
+  All values greater than or equal the given value.
+  """
+  unitCost_gte: Float
+  quantity: Int
+  """
+  All values that are not equal to given value.
+  """
+  quantity_not: Int
+  """
+  All values that are contained in given list.
+  """
+  quantity_in: [Int!]
+  """
+  All values that are not contained in given list.
+  """
+  quantity_not_in: [Int!]
+  """
+  All values less than the given value.
+  """
+  quantity_lt: Int
+  """
+  All values less than or equal the given value.
+  """
+  quantity_lte: Int
+  """
+  All values greater than the given value.
+  """
+  quantity_gt: Int
+  """
+  All values greater than or equal the given value.
+  """
+  quantity_gte: Int
+  receivedBy: UserWhereInput
+  product: ProductWhereInput
+}
+
+input ReceiptWhereUniqueInput {
+  id: ID
 }
 
 """
@@ -1259,10 +1312,9 @@ type SaleConnection {
 }
 
 input SaleCreateInput {
-  price: Float!
-  seller: UserCreateOneWithoutSalesInput!
+  unitPrice: Float!
+  quantity: Int!
   product: ProductCreateOneWithoutSalesInput!
-  items: ItemCreateManyWithoutSaleInput
 }
 
 input SaleCreateManyInput {
@@ -1275,32 +1327,9 @@ input SaleCreateManyWithoutProductInput {
   connect: [SaleWhereUniqueInput!]
 }
 
-input SaleCreateManyWithoutSellerInput {
-  create: [SaleCreateWithoutSellerInput!]
-  connect: [SaleWhereUniqueInput!]
-}
-
-input SaleCreateOneWithoutItemsInput {
-  create: SaleCreateWithoutItemsInput
-  connect: SaleWhereUniqueInput
-}
-
-input SaleCreateWithoutItemsInput {
-  price: Float!
-  seller: UserCreateOneWithoutSalesInput!
-  product: ProductCreateOneWithoutSalesInput!
-}
-
 input SaleCreateWithoutProductInput {
-  price: Float!
-  seller: UserCreateOneWithoutSalesInput!
-  items: ItemCreateManyWithoutSaleInput
-}
-
-input SaleCreateWithoutSellerInput {
-  price: Float!
-  product: ProductCreateOneWithoutSalesInput!
-  items: ItemCreateManyWithoutSaleInput
+  unitPrice: Float!
+  quantity: Int!
 }
 
 """
@@ -1324,15 +1353,18 @@ enum SaleOrderByInput {
   createdAt_DESC
   updatedAt_ASC
   updatedAt_DESC
-  price_ASC
-  price_DESC
+  unitPrice_ASC
+  unitPrice_DESC
+  quantity_ASC
+  quantity_DESC
 }
 
 type SalePreviousValues {
   id: ID!
   createdAt: DateTime!
   updatedAt: DateTime!
-  price: Float!
+  unitPrice: Float!
+  quantity: Int!
 }
 
 type SaleSubscriptionPayload {
@@ -1371,17 +1403,15 @@ input SaleSubscriptionWhereInput {
 }
 
 input SaleUpdateDataInput {
-  price: Float
-  seller: UserUpdateOneWithoutSalesInput
+  unitPrice: Float
+  quantity: Int
   product: ProductUpdateOneWithoutSalesInput
-  items: ItemUpdateManyWithoutSaleInput
 }
 
 input SaleUpdateInput {
-  price: Float
-  seller: UserUpdateOneWithoutSalesInput
+  unitPrice: Float
+  quantity: Int
   product: ProductUpdateOneWithoutSalesInput
-  items: ItemUpdateManyWithoutSaleInput
 }
 
 input SaleUpdateManyInput {
@@ -1402,60 +1432,19 @@ input SaleUpdateManyWithoutProductInput {
   upsert: [SaleUpsertWithoutProductInput!]
 }
 
-input SaleUpdateManyWithoutSellerInput {
-  create: [SaleCreateWithoutSellerInput!]
-  connect: [SaleWhereUniqueInput!]
-  disconnect: [SaleWhereUniqueInput!]
-  delete: [SaleWhereUniqueInput!]
-  update: [SaleUpdateWithoutSellerInput!]
-  upsert: [SaleUpsertWithoutSellerInput!]
-}
-
 input SaleUpdateNestedInput {
   where: SaleWhereUniqueInput!
   data: SaleUpdateDataInput!
 }
 
-input SaleUpdateOneWithoutItemsInput {
-  create: SaleCreateWithoutItemsInput
-  connect: SaleWhereUniqueInput
-  disconnect: SaleWhereUniqueInput
-  delete: SaleWhereUniqueInput
-  update: SaleUpdateWithoutItemsInput
-  upsert: SaleUpsertWithoutItemsInput
-}
-
-input SaleUpdateWithoutItemsDataInput {
-  price: Float
-  seller: UserUpdateOneWithoutSalesInput
-  product: ProductUpdateOneWithoutSalesInput
-}
-
-input SaleUpdateWithoutItemsInput {
-  where: SaleWhereUniqueInput!
-  data: SaleUpdateWithoutItemsDataInput!
-}
-
 input SaleUpdateWithoutProductDataInput {
-  price: Float
-  seller: UserUpdateOneWithoutSalesInput
-  items: ItemUpdateManyWithoutSaleInput
+  unitPrice: Float
+  quantity: Int
 }
 
 input SaleUpdateWithoutProductInput {
   where: SaleWhereUniqueInput!
   data: SaleUpdateWithoutProductDataInput!
-}
-
-input SaleUpdateWithoutSellerDataInput {
-  price: Float
-  product: ProductUpdateOneWithoutSalesInput
-  items: ItemUpdateManyWithoutSaleInput
-}
-
-input SaleUpdateWithoutSellerInput {
-  where: SaleWhereUniqueInput!
-  data: SaleUpdateWithoutSellerDataInput!
 }
 
 input SaleUpsertNestedInput {
@@ -1464,22 +1453,10 @@ input SaleUpsertNestedInput {
   create: SaleCreateInput!
 }
 
-input SaleUpsertWithoutItemsInput {
-  where: SaleWhereUniqueInput!
-  update: SaleUpdateWithoutItemsDataInput!
-  create: SaleCreateWithoutItemsInput!
-}
-
 input SaleUpsertWithoutProductInput {
   where: SaleWhereUniqueInput!
   update: SaleUpdateWithoutProductDataInput!
   create: SaleCreateWithoutProductInput!
-}
-
-input SaleUpsertWithoutSellerInput {
-  where: SaleWhereUniqueInput!
-  update: SaleUpdateWithoutSellerDataInput!
-  create: SaleCreateWithoutSellerInput!
 }
 
 input SaleWhereInput {
@@ -1602,40 +1579,65 @@ input SaleWhereInput {
   All values greater than or equal the given value.
   """
   updatedAt_gte: DateTime
-  price: Float
+  unitPrice: Float
   """
   All values that are not equal to given value.
   """
-  price_not: Float
+  unitPrice_not: Float
   """
   All values that are contained in given list.
   """
-  price_in: [Float!]
+  unitPrice_in: [Float!]
   """
   All values that are not contained in given list.
   """
-  price_not_in: [Float!]
+  unitPrice_not_in: [Float!]
   """
   All values less than the given value.
   """
-  price_lt: Float
+  unitPrice_lt: Float
   """
   All values less than or equal the given value.
   """
-  price_lte: Float
+  unitPrice_lte: Float
   """
   All values greater than the given value.
   """
-  price_gt: Float
+  unitPrice_gt: Float
   """
   All values greater than or equal the given value.
   """
-  price_gte: Float
-  seller: UserWhereInput
+  unitPrice_gte: Float
+  quantity: Int
+  """
+  All values that are not equal to given value.
+  """
+  quantity_not: Int
+  """
+  All values that are contained in given list.
+  """
+  quantity_in: [Int!]
+  """
+  All values that are not contained in given list.
+  """
+  quantity_not_in: [Int!]
+  """
+  All values less than the given value.
+  """
+  quantity_lt: Int
+  """
+  All values less than or equal the given value.
+  """
+  quantity_lte: Int
+  """
+  All values greater than the given value.
+  """
+  quantity_gt: Int
+  """
+  All values greater than or equal the given value.
+  """
+  quantity_gte: Int
   product: ProductWhereInput
-  items_every: ItemWhereInput
-  items_some: ItemWhereInput
-  items_none: ItemWhereInput
 }
 
 input SaleWhereUniqueInput {
@@ -1644,7 +1646,7 @@ input SaleWhereUniqueInput {
 
 type Subscription {
   product(where: ProductSubscriptionWhereInput): ProductSubscriptionPayload
-  item(where: ItemSubscriptionWhereInput): ItemSubscriptionPayload
+  receipt(where: ReceiptSubscriptionWhereInput): ReceiptSubscriptionPayload
   sale(where: SaleSubscriptionWhereInput): SaleSubscriptionPayload
   order(where: OrderSubscriptionWhereInput): OrderSubscriptionPayload
   user(where: UserSubscriptionWhereInput): UserSubscriptionPayload
@@ -1670,9 +1672,13 @@ input UserCreateInput {
   password: String!
   name: String!
   role: UserRole!
-  sales: SaleCreateManyWithoutSellerInput
+  receipts: ReceiptCreateManyWithoutReceivedByInput
   orders: OrderCreateManyWithoutSellerInput
-  itemsReceived: ItemCreateManyInput
+}
+
+input UserCreateOneInput {
+  create: UserCreateInput
+  connect: UserWhereUniqueInput
 }
 
 input UserCreateOneWithoutOrdersInput {
@@ -1680,8 +1686,8 @@ input UserCreateOneWithoutOrdersInput {
   connect: UserWhereUniqueInput
 }
 
-input UserCreateOneWithoutSalesInput {
-  create: UserCreateWithoutSalesInput
+input UserCreateOneWithoutReceiptsInput {
+  create: UserCreateWithoutReceiptsInput
   connect: UserWhereUniqueInput
 }
 
@@ -1690,17 +1696,15 @@ input UserCreateWithoutOrdersInput {
   password: String!
   name: String!
   role: UserRole!
-  sales: SaleCreateManyWithoutSellerInput
-  itemsReceived: ItemCreateManyInput
+  receipts: ReceiptCreateManyWithoutReceivedByInput
 }
 
-input UserCreateWithoutSalesInput {
+input UserCreateWithoutReceiptsInput {
   email: String!
   password: String!
   name: String!
   role: UserRole!
   orders: OrderCreateManyWithoutSellerInput
-  itemsReceived: ItemCreateManyInput
 }
 
 """
@@ -1782,14 +1786,36 @@ input UserSubscriptionWhereInput {
   node: UserWhereInput
 }
 
+input UserUpdateDataInput {
+  email: String
+  password: String
+  name: String
+  role: UserRole
+  receipts: ReceiptUpdateManyWithoutReceivedByInput
+  orders: OrderUpdateManyWithoutSellerInput
+}
+
 input UserUpdateInput {
   email: String
   password: String
   name: String
   role: UserRole
-  sales: SaleUpdateManyWithoutSellerInput
+  receipts: ReceiptUpdateManyWithoutReceivedByInput
   orders: OrderUpdateManyWithoutSellerInput
-  itemsReceived: ItemUpdateManyInput
+}
+
+input UserUpdateNestedInput {
+  where: UserWhereUniqueInput!
+  data: UserUpdateDataInput!
+}
+
+input UserUpdateOneInput {
+  create: UserCreateInput
+  connect: UserWhereUniqueInput
+  disconnect: UserWhereUniqueInput
+  delete: UserWhereUniqueInput
+  update: UserUpdateNestedInput
+  upsert: UserUpsertNestedInput
 }
 
 input UserUpdateOneWithoutOrdersInput {
@@ -1801,13 +1827,13 @@ input UserUpdateOneWithoutOrdersInput {
   upsert: UserUpsertWithoutOrdersInput
 }
 
-input UserUpdateOneWithoutSalesInput {
-  create: UserCreateWithoutSalesInput
+input UserUpdateOneWithoutReceiptsInput {
+  create: UserCreateWithoutReceiptsInput
   connect: UserWhereUniqueInput
   disconnect: UserWhereUniqueInput
   delete: UserWhereUniqueInput
-  update: UserUpdateWithoutSalesInput
-  upsert: UserUpsertWithoutSalesInput
+  update: UserUpdateWithoutReceiptsInput
+  upsert: UserUpsertWithoutReceiptsInput
 }
 
 input UserUpdateWithoutOrdersDataInput {
@@ -1815,8 +1841,7 @@ input UserUpdateWithoutOrdersDataInput {
   password: String
   name: String
   role: UserRole
-  sales: SaleUpdateManyWithoutSellerInput
-  itemsReceived: ItemUpdateManyInput
+  receipts: ReceiptUpdateManyWithoutReceivedByInput
 }
 
 input UserUpdateWithoutOrdersInput {
@@ -1824,18 +1849,23 @@ input UserUpdateWithoutOrdersInput {
   data: UserUpdateWithoutOrdersDataInput!
 }
 
-input UserUpdateWithoutSalesDataInput {
+input UserUpdateWithoutReceiptsDataInput {
   email: String
   password: String
   name: String
   role: UserRole
   orders: OrderUpdateManyWithoutSellerInput
-  itemsReceived: ItemUpdateManyInput
 }
 
-input UserUpdateWithoutSalesInput {
+input UserUpdateWithoutReceiptsInput {
   where: UserWhereUniqueInput!
-  data: UserUpdateWithoutSalesDataInput!
+  data: UserUpdateWithoutReceiptsDataInput!
+}
+
+input UserUpsertNestedInput {
+  where: UserWhereUniqueInput!
+  update: UserUpdateDataInput!
+  create: UserCreateInput!
 }
 
 input UserUpsertWithoutOrdersInput {
@@ -1844,10 +1874,10 @@ input UserUpsertWithoutOrdersInput {
   create: UserCreateWithoutOrdersInput!
 }
 
-input UserUpsertWithoutSalesInput {
+input UserUpsertWithoutReceiptsInput {
   where: UserWhereUniqueInput!
-  update: UserUpdateWithoutSalesDataInput!
-  create: UserCreateWithoutSalesInput!
+  update: UserUpdateWithoutReceiptsDataInput!
+  create: UserCreateWithoutReceiptsInput!
 }
 
 input UserWhereInput {
@@ -2084,15 +2114,12 @@ input UserWhereInput {
   All values that are not contained in given list.
   """
   role_not_in: [UserRole!]
-  sales_every: SaleWhereInput
-  sales_some: SaleWhereInput
-  sales_none: SaleWhereInput
+  receipts_every: ReceiptWhereInput
+  receipts_some: ReceiptWhereInput
+  receipts_none: ReceiptWhereInput
   orders_every: OrderWhereInput
   orders_some: OrderWhereInput
   orders_none: OrderWhereInput
-  itemsReceived_every: ItemWhereInput
-  itemsReceived_some: ItemWhereInput
-  itemsReceived_none: ItemWhereInput
 }
 
 input UserWhereUniqueInput {

@@ -1,29 +1,18 @@
-import { getUserId, Context } from '../utils'
+import { authenticate, Context } from '../utils';
 
-export const Query = {
-  feed(parent, args, ctx: Context, info) {
-    return ctx.db.query.posts({ where: { isPublished: true } }, info)
+export default {
+  viewer(parent, args, ctx: Context, info) {
+    const { id } = authenticate(ctx);
+    return ctx.db.query.user({ where: { id } }, info);
   },
 
-  drafts(parent, args, ctx: Context, info) {
-    const id = getUserId(ctx)
-
-    const where = {
-      isPublished: false,
-      author: {
-        id
-      }
-    }
-
-    return ctx.db.query.posts({ where }, info)
+  products(parent, args, ctx: Context, info) {
+    authenticate(ctx);
+    return ctx.db.query.products({}, info);
   },
 
-  post(parent, { id }, ctx: Context, info) {
-    return ctx.db.query.post({ where: { id: id } }, info)
+  orders(parent, args, ctx: Context, info) {
+    authenticate(ctx);
+    return ctx.db.query.orders({}, info);
   },
-
-  me(parent, args, ctx: Context, info) {
-    const id = getUserId(ctx)
-    return ctx.db.query.user({ where: { id } }, info)
-  },
-}
+};

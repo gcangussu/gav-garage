@@ -2,30 +2,32 @@ type Product {
   id: ID! @unique
   createdAt: DateTime!
   updatedAt: DateTime!
+  createdBy: User!
   description: String!
   picture: String!
-  price: Float!
-  items: [Item!]!
+  unitPrice: Float!
+  quantity: Int!
+  receipts: [Receipt!]!
   sales: [Sale!]!
 }
 
-type Item {
+type Receipt {
   id: ID! @unique
   createdAt: DateTime!
   updatedAt: DateTime!
+  receivedBy: User!
   product: Product!
-  cost: Float!
-  sale: Sale
+  unitCost: Float!
+  quantity: Int!
 }
 
 type Sale {
   id: ID! @unique
   createdAt: DateTime!
   updatedAt: DateTime!
-  price: Float!
-  seller: User!
   product: Product!
-  items: [Item!]!
+  unitPrice: Float!
+  quantity: Int!
 }
 
 type Order {
@@ -47,7 +49,6 @@ type User {
   password: String!
   name: String!
   role: UserRole!
-  sales: [Sale!]!
+  receipts: [Receipt!]!
   orders: [Order!]!
-  itemsReceived: [Item!]!
 }

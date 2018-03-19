@@ -1,13 +1,9 @@
-import { Query } from './Query'
-import { auth } from './Mutation/auth'
-import { post } from './Mutation/post'
-import { AuthPayload } from './AuthPayload'
+import Query from './Query';
+import Mutation from './Mutation';
+import otherRoot from './otherRoot';
 
 export default {
   Query,
-  Mutation: {
-    ...auth,
-    ...post,
-  },
-  AuthPayload,
-}
+  Mutation,
+  ...otherRoot,
+};
