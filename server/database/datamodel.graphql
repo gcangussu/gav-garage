@@ -1,0 +1,53 @@
+type Product {
+  id: ID! @unique
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  description: String!
+  picture: String!
+  price: Float!
+  items: [Item!]!
+  sales: [Sale!]!
+}
+
+type Item {
+  id: ID! @unique
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  product: Product!
+  cost: Float!
+  sale: Sale
+}
+
+type Sale {
+  id: ID! @unique
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  price: Float!
+  seller: User!
+  product: Product!
+  items: [Item!]!
+}
+
+type Order {
+  id: ID! @unique
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  sales: [Sale!]!
+  seller: User!
+}
+
+enum UserRole {
+  SELLER
+  INVENTORY_MANAGER
+}
+
+type User {
+  id: ID! @unique
+  email: String! @unique
+  password: String!
+  name: String!
+  role: UserRole!
+  sales: [Sale!]!
+  orders: [Order!]!
+  itemsReceived: [Item!]!
+}

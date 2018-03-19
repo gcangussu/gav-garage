@@ -1,0 +1,56 @@
+# import Product, Item, Sale, Order, UserRole from "./generated/prisma.graphql"
+
+type Query {
+  viewer: User
+
+  products: [Product!]
+
+  orders: [Order!]!
+}
+
+type Mutation {
+  signup(
+    email: String!
+    password: String!
+    name: String!
+    role: UserRole!
+  ): AuthPayload!
+
+  login(email: String!, password: String!): AuthPayload!
+
+  addProductItems(
+    product: ProductInput!
+    quantity: Int!
+    unityCost: Float!
+  ): [Item!]!
+
+  sell(order: [SellOrder!]!): Order!
+}
+
+type AuthPayload {
+  token: String!
+  user: User!
+}
+
+type ProductData {
+  description: String!
+  picture: String!
+  price: Float!
+}
+
+union ProductInput = Product | ProductData
+
+type SellOrder {
+  product: Product!
+  quantity: Int!
+  unitPrice: Float!
+}
+
+type User {
+  id: ID!
+  email: String!
+  name: String!
+  role: UserRole!
+  sales: [Sale!]!
+  itemsReceived: [Item!]!
+}
