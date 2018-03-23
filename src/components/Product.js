@@ -1,7 +1,7 @@
 import React from 'react';
 import { graphql, createFragmentContainer } from 'react-relay';
 
-import type { Product_product } from './__generated__/Product_data.graphql';
+import type { Product_product } from './__generated__/Product_product.graphql';
 
 function Product({ product }: { product: Product_product }) {
   return (
