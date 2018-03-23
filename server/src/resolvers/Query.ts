@@ -15,4 +15,9 @@ export default {
     authenticate(ctx);
     return ctx.db.query.orders({}, info);
   },
+
+  receipts(parent, args, ctx: Context, info) {
+    authenticate(ctx);
+    return ctx.db.query.receipts({}, info);
+  },
 };

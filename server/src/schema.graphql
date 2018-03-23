@@ -1,4 +1,4 @@
-# import Product, Receipt, Sale, Order, UserRole from "./generated/prisma.graphql"
+# import Product, Receipt, Order, UserRole from "./generated/prisma.graphql"
 
 type Query {
   viewer: User
@@ -6,6 +6,8 @@ type Query {
   products: [Product!]
 
   orders: [Order!]!
+
+  receipts: [Receipt!]!
 }
 
 type Mutation {

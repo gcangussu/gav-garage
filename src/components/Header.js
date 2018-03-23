@@ -7,7 +7,7 @@ import { clearToken } from '../actions';
 
 function Header({ logout }: { logout(): void }) {
   return (
-    <header>
+    <header className="mb3">
       <nav className="dt w-100 mw8 center">
         <div className="dtc w10 v-mid pb3">
           <Link
@@ -22,13 +22,19 @@ function Header({ logout }: { logout(): void }) {
             className="f6 fw4 hover-black no-underline black-70 dn dib pv2 ph3"
             to="/"
           >
-            How it Works
+            Produtos
           </Link>
           <Link
             className="f6 fw4 hover-black no-underline black-70 dn dib pv2 ph3"
-            to="/"
+            to="/receipts"
           >
-            Pricing
+            Recibos
+          </Link>
+          <Link
+            className="f6 fw4 hover-black no-underline black-70 dn dib pv2 ph3"
+            to="/orders"
+          >
+            Estoque
           </Link>
           <button
             className="f6 fw4 hover-black no-underline black-70 dib ml2 pv2 ph3 bg-white pointer ba b--black-70"

@@ -6,7 +6,8 @@
     "import/prefer-default-export": "off",
     "jsx-a11y/label-has-for": "off",
     "react/prop-types": "off",
-    "jsx-a11y/anchor-is-valid": "off"
+    "jsx-a11y/anchor-is-valid": "off",
+    "camelcase": "off"
   },
   "env": {
     "browser": true

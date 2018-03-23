@@ -18,16 +18,19 @@ import type {
   LoginMutationVariables,
 } from './__generated__/LoginMutation.graphql';
 
-type FormProps = {|
+type FormProps = {
   handleSubmit: SyntheticEvent<HTMLFormElement>,
-|};
+  isLoading: boolean,
+};
 
-function LoginForm({ handleSubmit }: FormProps) {
+function LoginForm({ handleSubmit, isLoading }: FormProps) {
   return (
     <form onSubmit={handleSubmit} className="measure center">
       <Field name="email" label="Email" type="email" required />
       <Field name="password" label="Password" type="password" required />
-      <Button type="submit">Login</Button>
+      <Button type="submit" disabled={isLoading}>
+        {isLoading ? '...' : 'Login'}
+      </Button>
     </form>
   );
 }
@@ -45,15 +48,16 @@ type Props = {
   },
 };
 
-type State = {|
+type State = {
   error: string,
-|};
+  isLoading: boolean,
+};
 
 export class Login extends React.Component<Props, State> {
-  state: State = { error: '' };
+  state: State = { error: '', isLoading: false };
 
   handleLogin = (variables: LoginMutationVariables) => {
-    this.setState({ error: '' });
+    this.setState({ error: '', isLoading: true });
     promiseMutation(this.props.environment, {
       variables,
       mutation: graphql`
@@ -65,6 +69,7 @@ export class Login extends React.Component<Props, State> {
       `,
     })
       .then((resp: LoginMutationResponse) => {
+        this.setState({ isLoading: false });
         this.props.onLogin(resp.login.token);
       })
       .catch(error => {
@@ -85,7 +90,7 @@ export class Login extends React.Component<Props, State> {
         <h1 className="f1 lh-title tc">Por favor faça login.</h1>
         <EnhancedLoginForm
           onSubmit={this.handleLogin}
-          error={this.state.error}
+          isLoading={this.state.isLoading}
         />
         <Alert hidden={!error}>{error}</Alert>
       </div>
