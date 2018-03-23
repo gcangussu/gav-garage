@@ -81,7 +81,7 @@ export class Login extends React.Component<Props, State> {
 
     const { error } = this.state;
     return (
-      <div>
+      <div className="pa4">
         <h1 className="f1 lh-title tc">Por favor faça login.</h1>
         <EnhancedLoginForm
           onSubmit={this.handleLogin}

@@ -1,3 +1,10 @@
 import React from 'react';
 
-export default () => <div>Dash</div>;
+import { Header } from '.';
+
+export default () => (
+  <div className="pa3">
+    <Header />
+    <main>Dash</main>
+  </div>
+);

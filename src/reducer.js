@@ -7,6 +7,7 @@ import {
   createReducer,
   getTokenFromLocalStorage,
   setTokenOnLocalStorage,
+  removeTokenFromLocalStorage,
 } from './utils';
 import { setToken, clearToken } from './actions';
 
@@ -22,7 +23,10 @@ const handlers = {
     return state.set('token', token);
   },
 
-  [clearToken.toString()]: (state: S) => state.set('token', ''),
+  [clearToken.toString()]: (state: S) => {
+    removeTokenFromLocalStorage();
+    return state.set('token', '');
+  },
 };
 
 const reducer = combineReducers({
