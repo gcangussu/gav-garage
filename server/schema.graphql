@@ -3,18 +3,29 @@ type AuthPayload {
   user: User!
 }
 
-type ProductData {
+input CreateProductInput {
   description: String!
   picture: String!
   unitPrice: Float!
 }
 
-union ProductInput = Product | ProductData
+input ReceiveProductInput {
+  id: ID
+  create: CreateProductInput
+}
 
-type SellOrder {
-  product: Product!
+type ReceiveResponse {
+  receipt: Receipt!
+}
+
+input SellOrder {
+  productId: ID!
   unitPrice: Float!
   quantity: Int!
+}
+
+type SellResponse {
+  order: Order!
 }
 
 type User {
@@ -35,8 +46,8 @@ type Query {
 type Mutation {
   signup(email: String!, password: String!, name: String!, role: UserRole!): AuthPayload!
   login(email: String!, password: String!): AuthPayload!
-  receive(product: ProductInput!, quantity: Int!, unitCost: Float!): Receipt!
-  sell(order: [SellOrder!]!): Order!
+  receive(product: ReceiveProductInput!, quantity: Int!, unitCost: Float!): ReceiveResponse!
+  sell(order: [SellOrder!]!): SellResponse!
 }
 
 type Product implements Node {

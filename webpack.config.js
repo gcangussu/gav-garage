@@ -26,6 +26,9 @@ module.exports = function config(env = {}) {
     ],
     devServer: {
       historyApiFallback: true,
+      overlay: {
+        errors: true,
+      }
     },
   };
 };

@@ -1,10 +1,16 @@
 {
-    "extends": ["airbnb", "prettier"],
-    "parser": "babel-eslint",
-    "rules": {
-        "react/jsx-filename-extension": "off"
-    },
-    "env": {
-        "browser": true
-    }
+  "extends": ["airbnb", "prettier"],
+  "parser": "babel-eslint",
+  "rules": {
+    "react/jsx-filename-extension": "off",
+    "import/prefer-default-export": "off",
+    "jsx-a11y/label-has-for": "off",
+    "react/prop-types": "off"
+  },
+  "env": {
+    "browser": true
+  },
+  "globals": {
+    "SyntheticEvent": true
+  }
 }
