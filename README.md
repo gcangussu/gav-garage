@@ -31,3 +31,13 @@ yarn start
 ```
 
 O app estará disponível em `http://localhost:8080`
+
+Já existem dois usuários cadastrados no cluster público:
+
+Vendedor:
+- email: vendas@gav.com
+- senha: pass
+
+Estocador:
+- email: estoque@gav.com
+- senha: pass
