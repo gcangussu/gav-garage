@@ -1,4 +1,4 @@
-const path = require('path');
+const { resolve } = require('path');
 const HtmlWebPackPlugin = require('html-webpack-plugin');
 
 module.exports = function config(env = {}) {
@@ -10,7 +10,7 @@ module.exports = function config(env = {}) {
       rules: [
         {
           test: /\.js$/,
-          exclude: path.resolve(__dirname, 'node_modules'),
+          exclude: resolve(__dirname, 'node_modules'),
           use: ['babel-loader'],
         },
         {
@@ -21,14 +21,17 @@ module.exports = function config(env = {}) {
     },
     plugins: [
       new HtmlWebPackPlugin({
-        template: path.resolve(__dirname, 'public/index.html'),
+        template: resolve(__dirname, 'public/index.html'),
       }),
     ],
+    output: {
+      publicPath: '/',
+    },
     devServer: {
       historyApiFallback: true,
       overlay: {
         errors: true,
-      }
+      },
     },
   };
 };

@@ -11,7 +11,7 @@ function Product({ product }: { product: Product_product }) {
         <div
           className="aspect-ratio--object cover br2 br--top"
           style={{
-            background: 'url(http://placekitten.com/g/600/300) center',
+            background: `url(${product.picture}) center`,
           }}
         />
       </div>
@@ -35,6 +35,7 @@ export default createFragmentContainer(Product, {
       description
       unitPrice
       quantity
+      picture
     }
   `,
 });

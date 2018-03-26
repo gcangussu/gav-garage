@@ -1,6 +1,7 @@
 // @flow
 import { commitMutation } from 'react-relay';
 import { Environment, Network, RecordSource, Store } from 'relay-runtime';
+import type { MutationConfig } from 'relay-runtime';
 
 export function getEnvironment(token: string) {
   function fetchQuery(operation: any, variables: any) {
@@ -29,7 +30,10 @@ export function getEnvironment(token: string) {
   });
 }
 
-export function promiseMutation(environment: Environment, config: any) {
+export function promiseMutation<T>(
+  environment: Environment,
+  config: MutationConfig<T>,
+) {
   // $FlowFixMe
   return new Promise((resolve, reject) => {
     commitMutation(environment, {

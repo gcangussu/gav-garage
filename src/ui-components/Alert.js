@@ -1,12 +1,18 @@
 import React from 'react';
 
-export default function Alert({ title = '', children, hidden, ...rest } = {}) {
+export default function Alert({
+  title = '',
+  color = 'red',
+  children,
+  hidden,
+  ...rest
+} = {}) {
   return (
     <div
       className={
         hidden
           ? 'dn'
-          : 'flex items-center justify-center pa4 bg-washed-red dark-red'
+          : `flex items-center justify-center pa4 bg-washed-${color} dark-${color}`
       }
       hidden={hidden}
       {...rest}

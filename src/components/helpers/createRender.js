@@ -1,15 +1,12 @@
-import React from 'react';
+// @flow
+import * as React from 'react';
 
-import { Alert } from '../../ui-components';
+import { renderState } from '.';
 
-export default function createRender(Component) {
-  return function render({ props, error }) {
-    if (error) {
-      return <Alert>error</Alert>;
-    }
-    if (!props) {
-      return <div>Loading...</div>;
-    }
+export default function createRender(Component: React.ElementType) {
+  return function render({ props, error }: { props: any, error: Error }) {
+    const state = renderState(props, error);
+    if (state) return state;
     return <Component {...props} />;
   };
 }

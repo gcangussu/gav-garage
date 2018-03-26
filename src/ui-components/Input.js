@@ -1,14 +1,20 @@
+// @flow
 import React from 'react';
-import { Field } from 'redux-form';
+import { Field } from '.';
 
-type Props = { name: string };
-
-export default function Input(props: Props) {
+export default function Input({
+  fieldClass,
+  type,
+  ...props
+}: {
+  fieldClass?: string,
+  type?: string,
+}) {
   return (
     <Field
+      type={type || 'text'}
       component="input"
-      className="input-reset ba b--black-20 pa2 mb2 db w-100"
-      aria-describedby="name-desc"
+      fieldClass={`input-reset ba b--black-20 pa2 mb2 db ${fieldClass || ''}`}
       {...props}
     />
   );

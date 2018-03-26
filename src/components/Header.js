@@ -11,7 +11,7 @@ function Header({ logout, baseUrl }: { logout(): void, baseUrl: string }) {
   return (
     <header className="mb3">
       <nav className="dt w-100">
-        <div className="dtc w10 v-mid pb3">
+        <div className="dtc v-mid pb3">
           <Link
             className="dib h2 pv2 hover-black no-underline border-box"
             to={baseUrl}

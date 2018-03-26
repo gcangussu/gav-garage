@@ -8,7 +8,7 @@ import { graphql } from 'react-relay';
 import { Environment } from 'relay-runtime';
 import { Redirect } from 'react-router-dom';
 
-import { Field, Button, Alert } from '../ui-components';
+import { Input, Button, Alert } from '../ui-components';
 import { getRelayEnvironment, isAuthenticated } from '../selectors';
 import { setToken } from '../actions';
 import { promiseMutation } from '../relay';
@@ -26,8 +26,8 @@ type FormProps = {
 function LoginForm({ handleSubmit, isLoading }: FormProps) {
   return (
     <form onSubmit={handleSubmit} className="measure center">
-      <Field name="email" label="Email" type="email" required />
-      <Field name="password" label="Password" type="password" required />
+      <Input name="email" label="Email" type="email" required />
+      <Input name="password" label="Password" type="password" required />
       <Button type="submit" disabled={isLoading}>
         {isLoading ? '...' : 'Login'}
       </Button>

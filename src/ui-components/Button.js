@@ -1,9 +1,14 @@
 import React from 'react';
 
-export default function Button(props) {
+export default function Button({
+  color = 'white',
+  bg = 'black',
+  className = '',
+  ...props
+}) {
   return (
     <button
-      className="f6 link dim ph3 pv2 mb2 dib white bg-black ba b--black-90 pointer"
+      className={`f6 dim ph3 pv2 dib ${color} bg-${bg} bw0 pointer ${className}`}
       {...props}
     />
   );

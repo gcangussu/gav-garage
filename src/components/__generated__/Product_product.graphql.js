@@ -15,6 +15,7 @@ export type Product_product = {|
   +description: string,
   +unitPrice: number,
   +quantity: number,
+  +picture: string,
   +$refType: Product_product$ref,
 |};
 */
@@ -54,8 +55,15 @@ const node/*: ConcreteFragment*/ = {
       "name": "quantity",
       "args": null,
       "storageKey": null
+    },
+    {
+      "kind": "ScalarField",
+      "alias": null,
+      "name": "picture",
+      "args": null,
+      "storageKey": null
     }
   ]
 };
-(node/*: any*/).hash = '69a7652f2c71efc8fb31f4a9308236fb';
+(node/*: any*/).hash = '09fb052bcda3c3aa87d370d11bd5181b';
 module.exports = node;
