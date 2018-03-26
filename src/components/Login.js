@@ -75,6 +75,7 @@ export class Login extends React.Component<Props, State> {
       .catch(error => {
         this.setState({
           error: (error && error.message) || 'Unknown error',
+          isLoading: false,
         });
       });
   };
