@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash 92b91522a122aab492a281bd43fd5f04
+ * @relayHash 11751e46c450ca4c128efbbe066bbcf9
  */
 
 /* eslint-disable */
@@ -12,7 +12,7 @@ import type { ConcreteRequest } from 'relay-runtime';
 type Product_product$ref = any;
 export type ProductsListQueryVariables = {| |};
 export type ProductsListQueryResponse = {|
-  +products: ?$ReadOnlyArray<{|
+  +products: $ReadOnlyArray<{|
     +id: string,
     +$fragmentRefs: Product_product$ref,
   |}>,

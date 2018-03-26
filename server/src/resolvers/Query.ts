@@ -8,16 +8,16 @@ export default {
 
   products(parent, args, ctx: Context, info) {
     authenticate(ctx);
-    return ctx.db.query.products({}, info);
+    return ctx.db.query.products({ orderBy: 'updatedAt_DESC' }, info);
   },
 
   orders(parent, args, ctx: Context, info) {
     authenticate(ctx);
-    return ctx.db.query.orders({}, info);
+    return ctx.db.query.orders({ orderBy: 'updatedAt_DESC' }, info);
   },
 
   receipts(parent, args, ctx: Context, info) {
     authenticate(ctx);
-    return ctx.db.query.receipts({}, info);
+    return ctx.db.query.receipts({ orderBy: 'updatedAt_DESC' }, info);
   },
 };

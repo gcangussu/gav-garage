@@ -39,8 +39,9 @@ type User {
 
 type Query {
   viewer: User
-  products: [Product!]
+  products: [Product!]!
   orders: [Order!]!
+  receipts: [Receipt!]!
 }
 
 type Mutation {
@@ -71,11 +72,6 @@ type Order implements Node {
   seller(where: UserWhereInput): User!
 }
 
-enum UserRole {
-  SELLER
-  INVENTORY_MANAGER
-}
-
 type Receipt implements Node {
   id: ID!
   createdAt: DateTime!
@@ -84,6 +80,11 @@ type Receipt implements Node {
   product(where: ProductWhereInput): Product!
   unitCost: Float!
   quantity: Int!
+}
+
+enum UserRole {
+  SELLER
+  INVENTORY_MANAGER
 }
 
 """

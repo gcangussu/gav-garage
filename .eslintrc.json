@@ -7,7 +7,8 @@
     "jsx-a11y/label-has-for": "off",
     "react/prop-types": "off",
     "jsx-a11y/anchor-is-valid": "off",
-    "camelcase": "off"
+    "camelcase": "off",
+    "react/require-default-props": "off"
   },
   "env": {
     "browser": true

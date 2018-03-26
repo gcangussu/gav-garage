@@ -13,7 +13,7 @@ export default function App() {
   return (
     <Provider store={store}>
       <Router>
-        <div className="sans-serif">
+        <div className="sans-serif pa3 mw9 center">
           <Switch>
             <Route exact path="/login" component={Login} />
             <PrivateRoute path="/" component={Dashboard} />

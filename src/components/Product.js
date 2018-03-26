@@ -1,3 +1,4 @@
+// @flow
 import React from 'react';
 import { graphql, createFragmentContainer } from 'react-relay';
 
@@ -5,24 +6,24 @@ import type { Product_product } from './__generated__/Product_product.graphql';
 
 function Product({ product }: { product: Product_product }) {
   return (
-    <article className="br2 ba dark-gray b--black-10 mv4 w-100 w-50-m w-25-l mw5 center">
-      <img
-        src="http://placekitten.com/g/600/300"
-        className="db w-100 br2 br--top"
-        alt="Kitten looking menacing."
-      />
-      <div className="pa2 ph3-ns pb3-ns">
-        <div className="dt w-100 mt1">
-          <div className="dtc">
-            <h1 className="f5 f4-ns mv0">Cat</h1>
-          </div>
-          <div className="dtc tr">
-            <h2 className="f5 mv0">R$ {product.unitPrice}</h2>
-            <h2 className="f5 mv0">{product.quantity} unidades</h2>
-          </div>
-        </div>
-        <p className="f6 lh-copy measure mt2 mid-gray">{product.description}</p>
+    <article className="br2 ba b--black-10 w-100 mv4 mh2 mw5">
+      <div className="aspect-ratio aspect-ratio--8x5">
+        <div
+          className="aspect-ratio--object cover br2 br--top"
+          style={{
+            background: 'url(http://placekitten.com/g/600/300) center',
+          }}
+        />
       </div>
+      <section className="pa2 ph3-ns pb3-ns">
+        <h2 className="f4 normal lh-copy measure mt2 dark-gray">
+          {product.description}
+        </h2>
+        <p className="f5 mv1 b">R$ {product.unitPrice}</p>
+        <p className="f5 mv1 b">
+          {product.quantity} unidade{product.quantity && 's'}
+        </p>
+      </section>
     </article>
   );
 }

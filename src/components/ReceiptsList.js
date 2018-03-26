@@ -6,39 +6,39 @@ import { createStructuredSelector } from 'reselect';
 
 import { getRelayEnvironment } from '../selectors';
 
-import type { ProductsListQueryResponse } from './__generated__/ProductsListQuery.graphql';
+import type { ReceiptsListQueryResponse } from './__generated__/ReceiptsListQuery.graphql';
 import { createRender } from './helpers';
-import { Product } from '.';
+import { Receipt } from '.';
 
-const ProductsRenderer = createRender((props: ProductsListQueryResponse) => (
+const ReceiptsRenderer = createRender((props: ReceiptsListQueryResponse) => (
   <section>
-    <h1 className="f2 fw5 lh-copy">Produtos</h1>
+    <h1 className="f2 fw5 lh-copy">Recibos</h1>
     <div className="flex flex-wrap justify-around">
-      {props.products.map(p => <Product key={p.id} product={p} />)}
+      {props.receipts.map(p => <Receipt key={p.id} receipt={p} />)}
     </div>
   </section>
 ));
 
-const productsListQuery = graphql`
-  query ProductsListQuery {
-    products {
+const receiptsListQuery = graphql`
+  query ReceiptsListQuery {
+    receipts {
       id
-      ...Product_product
+      ...Receipt_receipt
     }
   }
 `;
 
-function ProductsList({ environment }) {
+function ReceiptsList({ environment }) {
   return (
     <QueryRenderer
       environment={environment}
-      query={productsListQuery}
+      query={receiptsListQuery}
       variables={{}}
-      render={ProductsRenderer}
+      render={ReceiptsRenderer}
     />
   );
 }
 
 export default connect(
   createStructuredSelector({ environment: getRelayEnvironment }),
-)(ProductsList);
+)(ReceiptsList);

@@ -6,39 +6,39 @@ import { createStructuredSelector } from 'reselect';
 
 import { getRelayEnvironment } from '../selectors';
 
-import type { ProductsListQueryResponse } from './__generated__/ProductsListQuery.graphql';
+import type { OrdersListQueryResponse } from './__generated__/OrdersListQuery.graphql';
 import { createRender } from './helpers';
-import { Product } from '.';
+import { Order } from '.';
 
-const ProductsRenderer = createRender((props: ProductsListQueryResponse) => (
+const OrdersRenderer = createRender((props: OrdersListQueryResponse) => (
   <section>
-    <h1 className="f2 fw5 lh-copy">Produtos</h1>
+    <h1 className="f2 fw5 lh-copy">Ordens</h1>
     <div className="flex flex-wrap justify-around">
-      {props.products.map(p => <Product key={p.id} product={p} />)}
+      {props.orders.map(p => <Order key={p.id} order={p} />)}
     </div>
   </section>
 ));
 
-const productsListQuery = graphql`
-  query ProductsListQuery {
-    products {
+const ordersListQuery = graphql`
+  query OrdersListQuery {
+    orders {
       id
-      ...Product_product
+      ...Order_order
     }
   }
 `;
 
-function ProductsList({ environment }) {
+function OrdersList({ environment }) {
   return (
     <QueryRenderer
       environment={environment}
-      query={productsListQuery}
+      query={ordersListQuery}
       variables={{}}
-      render={ProductsRenderer}
+      render={OrdersRenderer}
     />
   );
 }
 
 export default connect(
   createStructuredSelector({ environment: getRelayEnvironment }),
-)(ProductsList);
+)(OrdersList);
