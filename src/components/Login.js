@@ -93,7 +93,7 @@ export class Login extends React.Component<Props, State> {
           onSubmit={this.handleLogin}
           isLoading={this.state.isLoading}
         />
-        <Alert hidden={!error} className="mt3">
+        <Alert hidden={!error} style={{ marginTop: '1rem' }}>
           {error}
         </Alert>
       </div>
