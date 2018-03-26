@@ -1,18 +1,20 @@
+// @flow
 import React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
+import { join } from 'path';
 
 import { clearToken } from '../actions';
 
-function Header({ logout }: { logout(): void }) {
+function Header({ logout, baseUrl }: { logout(): void, baseUrl: string }) {
   return (
     <header className="mb3">
       <nav className="dt w-100">
         <div className="dtc w10 v-mid pb3">
           <Link
             className="dib h2 pv2 hover-black no-underline border-box"
-            to="/"
+            to={baseUrl}
           >
             GAV Garage
           </Link>
@@ -20,19 +22,19 @@ function Header({ logout }: { logout(): void }) {
         <div className="dtc v-mid tr pb3">
           <Link
             className="f6 fw4 hover-black no-underline black-70 dn dib pv2 ph3"
-            to="/"
+            to={join(baseUrl, 'products')}
           >
             Produtos
           </Link>
           <Link
             className="f6 fw4 hover-black no-underline black-70 dn dib pv2 ph3"
-            to="/receipts"
+            to={join(baseUrl, 'receipts')}
           >
             Recibos
           </Link>
           <Link
             className="f6 fw4 hover-black no-underline black-70 dn dib pv2 ph3"
-            to="/orders"
+            to={join(baseUrl, 'orders')}
           >
             Vendas
           </Link>

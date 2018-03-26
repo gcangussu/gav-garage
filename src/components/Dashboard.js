@@ -1,7 +1,7 @@
 // @flow
 import React from 'react';
-import { Route, Switch } from 'react-router-dom';
-import { resolve } from 'path';
+import { Route, Switch, Redirect } from 'react-router-dom';
+import { join } from 'path';
 
 import { Alert } from '../ui-components';
 import { Header, ProductsList, ReceiptsList, OrdersList } from '.';
@@ -14,12 +14,13 @@ type Props = {
 
 export default ({ match: { url } }: Props) => (
   <div className="pa3">
-    <Header />
+    <Header baseUrl={url} />
     <main>
       <Switch>
-        <Route exact path={url} component={ProductsList} />
-        <Route path={resolve(url, 'receipts')} component={ReceiptsList} />
-        <Route path={resolve(url, 'orders')} component={OrdersList} />
+        <Redirect exact from={url} to={join(url, 'products')} />
+        <Route path={join(url, 'products')} component={ProductsList} />
+        <Route path={join(url, 'receipts')} component={ReceiptsList} />
+        <Route path={join(url, 'orders')} component={OrdersList} />
         <Route component={Error404} />
       </Switch>
     </main>
